@@ -26,8 +26,8 @@ def plot_4filters(img):
     plt.show()
 
 def plot_line_segments(img):
-    lines = lsd.detect(img)[0]
-    img_lines = lsd.drawSegments(img, lines)
+    lines = cv2.detect(img)[0]
+    img_lines = cv2.drawSegments(img, lines)
 
     plt.figure(figsize=(16,16))
     plt.imshow(img_lines)
@@ -41,7 +41,7 @@ def main():
 
 if __name__ == '__main__':
     img_dir = '../img/'
-    colours = [f'{n}' for n in range(1,7)]
+    colours = [f'w_{n}' for n in range(1,7)]
 
     imgs = []
     for colour in colours:
