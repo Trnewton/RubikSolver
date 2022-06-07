@@ -1,4 +1,5 @@
 from ctypes.wintypes import PLARGE_INTEGER
+from http.client import UNSUPPORTED_MEDIA_TYPE
 import cv2
 
 import numpy as np
@@ -7,6 +8,16 @@ from sklearn.cluster import KMeans
 
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
+
+COLOUR_MASKS = {
+    'w' : ((0,179), (0,15), (220, 359)),
+    'g' : ((50, 60), (130, 160), (180, 210)),
+    'r' : ((170, 10), (160, 240), (200, 240)),
+    'b' : ((105, 140), (45, 255), (190, 255)),
+    'y' : ((25, 40), (140, 255), (210, 255)),
+    'o' : ((5, 20), (120, 255), (210, 255))
+}
+
 
 def plot_4filters(img):
 
@@ -33,13 +44,58 @@ def plot_line_segments(img):
     plt.imshow(img_lines)
     plt.show()
 
+def hsv_vis(path, start_vals=None):
+    ''''''
 
-def main():
+    img = cv2.imread(path)
+    img_HSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+    win_name = 'HSV Mask'
+    MAX_HUE = 179
+    MAX_SAT = 255
+    MAX_VAL = 255
+    if start_vals is None:
+        start_vals = ((0, MAX_HUE), (0, MAX_SAT), (0, MAX_VAL))
+
+    def _on_tracker(val):
+        h_min = cv2.getTrackbarPos('Hue Min', win_name)
+        h_max = cv2.getTrackbarPos('Hue Max', win_name)
+        s_min = cv2.getTrackbarPos('Sat Min', win_name)
+        s_max = cv2.getTrackbarPos('Sat Max', win_name)
+        v_min = cv2.getTrackbarPos('Val Min', win_name)
+        v_max = cv2.getTrackbarPos('Val Max', win_name)
+
+        # Check for wrapping hue range
+        if h_min > h_max:
+            mask_1 = cv2.inRange(img_HSV, (h_min, s_min, v_min), (MAX_HUE, s_max, v_max))
+            mask_2 = cv2.inRange(img_HSV, (0, s_min, v_min), (h_max, s_max, v_max))
+            mask = mask_1 | mask_2
+        else:
+            mask = cv2.inRange(img_HSV, (h_min, s_min, v_min), (h_max, s_max, v_max))
+        cv2.imshow(win_name, mask)
+
+    cv2.namedWindow('Original', 0)
+    cv2.imshow('Original', img)
+    cv2.resizeWindow('Original',400,400)
+
+    cv2.namedWindow(win_name, 0)
+    cv2.resizeWindow(win_name,400,400)
+
+    cv2.createTrackbar('Hue Min', win_name, start_vals[0][0], MAX_HUE, _on_tracker)
+    cv2.createTrackbar('Hue Max', win_name, start_vals[0][1], MAX_HUE, _on_tracker)
+    cv2.createTrackbar('Sat Min', win_name, start_vals[1][0], MAX_SAT, _on_tracker)
+    cv2.createTrackbar('Sat Max', win_name, start_vals[1][1], MAX_SAT, _on_tracker)
+    cv2.createTrackbar('Val Min', win_name, start_vals[2][0], MAX_VAL, _on_tracker)
+    cv2.createTrackbar('Val Max', win_name, start_vals[2][1], MAX_VAL, _on_tracker)
+
+    _on_tracker(0)
+
+    cv2.waitKey(0)
+
+def read_face(face):
     pass
 
-
-
-if __name__ == '__main__':
+def main():
     img_dir = '../img/'
     colours = [f'w_{n}' for n in range(1,7)]
 
@@ -90,6 +146,7 @@ if __name__ == '__main__':
 
     plt.show()
 
-
-
-
+if __name__ == '__main__':
+    img_arr = [f'../img/{val}.jpg' for val in range(1, 7)]
+    for img in img_arr:
+        hsv_vis(img, COLOUR_MASKS['o'])
