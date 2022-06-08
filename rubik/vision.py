@@ -7,17 +7,19 @@ from sklearn.mixture import BayesianGaussianMixture as BGMM
 from sklearn.cluster import KMeans
 
 from matplotlib import pyplot as plt
-from matplotlib.axes import Axes
 
 COLOUR_MASKS = {
-    'w' : ((0,179), (0,15), (220, 359)),
-    'g' : ((50, 60), (130, 160), (180, 210)),
-    'r' : ((170, 10), (160, 240), (200, 240)),
-    'b' : ((105, 140), (45, 255), (190, 255)),
-    'y' : ((25, 40), (140, 255), (210, 255)),
-    'o' : ((5, 20), (120, 255), (210, 255))
+    'w' : ((0, 0, 220), (179, 15, 359)),
+    'g' : ((50, 130, 180), (60, 160, 210)),
+    'r' : ((170, 160, 200), (10, 240, 240)),
+    'b' : ((105, 45, 190), (140, 255, 255)),
+    'y' : ((25, 140, 210), (40, 255, 255)),
+    'o' : ((5, 120, 210), (20, 255, 255))
 }
 
+MAX_HUE = 179
+MAX_SAT = 255
+MAX_VAL = 255
 
 def plot_4filters(img):
 
@@ -51,11 +53,8 @@ def hsv_vis(path, start_vals=None):
     img_HSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     win_name = 'HSV Mask'
-    MAX_HUE = 179
-    MAX_SAT = 255
-    MAX_VAL = 255
     if start_vals is None:
-        start_vals = ((0, MAX_HUE), (0, MAX_SAT), (0, MAX_VAL))
+        start_vals = ((0, 0, 0), (MAX_HUE, MAX_SAT, MAX_VAL))
 
     def _on_tracker(val):
         h_min = cv2.getTrackbarPos('Hue Min', win_name)
@@ -82,18 +81,52 @@ def hsv_vis(path, start_vals=None):
     cv2.resizeWindow(win_name,400,400)
 
     cv2.createTrackbar('Hue Min', win_name, start_vals[0][0], MAX_HUE, _on_tracker)
-    cv2.createTrackbar('Hue Max', win_name, start_vals[0][1], MAX_HUE, _on_tracker)
-    cv2.createTrackbar('Sat Min', win_name, start_vals[1][0], MAX_SAT, _on_tracker)
+    cv2.createTrackbar('Hue Max', win_name, start_vals[1][0], MAX_HUE, _on_tracker)
+    cv2.createTrackbar('Sat Min', win_name, start_vals[0][1], MAX_SAT, _on_tracker)
     cv2.createTrackbar('Sat Max', win_name, start_vals[1][1], MAX_SAT, _on_tracker)
-    cv2.createTrackbar('Val Min', win_name, start_vals[2][0], MAX_VAL, _on_tracker)
-    cv2.createTrackbar('Val Max', win_name, start_vals[2][1], MAX_VAL, _on_tracker)
+    cv2.createTrackbar('Val Min', win_name, start_vals[0][2], MAX_VAL, _on_tracker)
+    cv2.createTrackbar('Val Max', win_name, start_vals[1][2], MAX_VAL, _on_tracker)
 
     _on_tracker(0)
 
     cv2.waitKey(0)
 
+def HSV_mask(img, HSV_range):
+    # Check for wrapping hue range
+    if HSV_range[0][0] > HSV_range[1][0]:
+        mask_1 = cv2.inRange(img, HSV_range[0], (MAX_HUE, HSV_range[1][1], HSV_range[1][2]))
+        mask_2 = cv2.inRange(img, (0, HSV_range[0][1], HSV_range[0][2]), HSV_range[1])
+        mask = mask_1 | mask_2
+    else:
+        mask = cv2.inRange(img, HSV_range[0], HSV_range[1])
+
+    return mask
+
 def read_face(face):
-    pass
+    face_HSV = cv2.cvtColor(face, cv2.COLOR_BGR2HSV)
+    # for each colour get contours with position and label data then take 9 largest contours
+    store = []
+    for colour, HSV_range in COLOUR_MASKS.items():
+        mask = HSV_mask(face_HSV, HSV_range)
+        contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+        store += [(c, colour) for c in contours]
+
+    store = sorted(store, key=lambda val: cv2.contourArea(val[0]), reverse=True)
+    # use 9 largest contours to get orientation and relative positions
+
+    _ = cv2.drawContours(face, [cont for cont,_ in store][:9], -1,  (0,255,0), 3)
+
+    for cont, colour in store[:9]:
+        M = cv2.moments(cont)
+        x, y = int(M['m10']/M['m00']), int(M['m01']/M['m00'])
+        print(x, y, colour)
+        cv2.circle(face, (x, y), 50, (0,0,0),-1)
+
+    cv2.namedWindow('Foo', 0)
+    cv2.resizeWindow('Foo',400,400)
+    cv2.imshow('Foo', face)
+    cv2.waitKey(0)
 
 def main():
     img_dir = '../img/'
@@ -147,6 +180,7 @@ def main():
     plt.show()
 
 if __name__ == '__main__':
-    img_arr = [f'../img/{val}.jpg' for val in range(1, 7)]
-    for img in img_arr:
-        hsv_vis(img, COLOUR_MASKS['o'])
+    img_arr = [f'../img/{val}.jpg' for val in range(1, 2)]
+    for img_name in img_arr:
+        img = cv2.imread(img_name)
+        read_face(img)
