@@ -9,6 +9,9 @@ from sklearn.cluster import KMeans
 
 from matplotlib import pyplot as plt
 
+
+#### Constants ####
+
 COLOUR_RANGES = {
     'w' : ((0, 0, 220), (179, 15, 359)),
     'g' : ((50, 130, 180), (60, 160, 210)),
@@ -21,6 +24,25 @@ COLOUR_RANGES = {
 MAX_HUE = 179
 MAX_SAT = 255
 MAX_VAL = 255
+
+
+#### Classes ####
+
+@dataclass
+class SubFace:
+    colour: str
+    contour: np.ndarray
+    center: tuple[int] = None
+
+    def get_center(self):
+        if self.center is None:
+            M = cv2.moments(self.contour)
+            self.center = int(M['m10'] / M['m00']), int(M['m01'] / M['m00'])
+
+        return self.center
+
+
+#### Functions ####
 
 def plot_4filters(img):
 
@@ -105,19 +127,6 @@ def HSV_mask(img, HSV_range):
 
     return mask
 
-@dataclass
-class SubFace:
-    colour: str
-    contour: np.ndarray
-    center: tuple[int] = None
-
-    def get_center(self):
-        if self.center is None:
-            M = cv2.moments(self.contour)
-            self.center = int(M['m10'] / M['m00']), int(M['m01'] / M['m00'])
-
-        return self.center
-
 def get_subface_contours(face) -> list[SubFace]:
     '''Reads a face of a rubik cube to identify the subsquare colours and contours.
 
@@ -137,15 +146,8 @@ def get_subface_contours(face) -> list[SubFace]:
     # Return 9 biggest contours as subfaces
     return [SubFace(colour, cont) for colour, cont in cont_colour_pairs[:9]]
 
-def euclid_dist(a,b):
-    tot = 0
-    for a_i, b_i in zip(a,b):
-        tot += (a_i - b_i)**2
-
-    return np.sqrt(tot)
-
 def read_subface_singleface(subfaces:list[SubFace], cube_dim=3) -> tuple[tuple[str]]:
-    '''Finds orientation of subfaces. Note only works if face is entirely in the plane of image.'''
+    '''Finds subface layout. Assumes that face is not rotated.'''
 
     face_layout = [['' for n in range(cube_dim)] for m in range(cube_dim)]
 
