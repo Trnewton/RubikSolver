@@ -1,8 +1,6 @@
-from ctypes.wintypes import PLARGE_INTEGER
 from dataclasses import dataclass
-from http.client import UNSUPPORTED_MEDIA_TYPE
-import cv2
 
+import cv2
 import numpy as np
 from sklearn.mixture import BayesianGaussianMixture as BGMM
 from sklearn.cluster import KMeans
@@ -40,6 +38,9 @@ class SubFace:
             self.center = int(M['m10'] / M['m00']), int(M['m01'] / M['m00'])
 
         return self.center
+
+@dataclass
+class Rubik_Cube:
 
 
 #### Functions ####
@@ -166,6 +167,6 @@ if __name__ == '__main__':
     for img_name in img_arr:
         img = cv2.imread(img_name)
         subfaces = get_subface_contours(img)
-
         face_layout = read_subface_singleface(subfaces)
-        print(face_layout)
+
+
