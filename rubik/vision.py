@@ -1,4 +1,5 @@
 from ctypes.wintypes import PLARGE_INTEGER
+from dataclasses import dataclass
 from http.client import UNSUPPORTED_MEDIA_TYPE
 import cv2
 
@@ -8,7 +9,7 @@ from sklearn.cluster import KMeans
 
 from matplotlib import pyplot as plt
 
-COLOUR_MASKS = {
+COLOUR_RANGES = {
     'w' : ((0, 0, 220), (179, 15, 359)),
     'g' : ((50, 130, 180), (60, 160, 210)),
     'r' : ((170, 160, 200), (10, 240, 240)),
@@ -92,6 +93,8 @@ def hsv_vis(path, start_vals=None):
     cv2.waitKey(0)
 
 def HSV_mask(img, HSV_range):
+    '''Returns mask of image for given HSV range.'''
+
     # Check for wrapping hue range
     if HSV_range[0][0] > HSV_range[1][0]:
         mask_1 = cv2.inRange(img, HSV_range[0], (MAX_HUE, HSV_range[1][1], HSV_range[1][2]))
@@ -102,85 +105,65 @@ def HSV_mask(img, HSV_range):
 
     return mask
 
-def read_face(face):
+@dataclass
+class SubFace:
+    colour: str
+    contour: np.ndarray
+    center: tuple[int] = None
+
+    def get_center(self):
+        if self.center is None:
+            M = cv2.moments(self.contour)
+            self.center = int(M['m10'] / M['m00']), int(M['m01'] / M['m00'])
+
+        return self.center
+
+def get_subface_contours(face) -> list[SubFace]:
+    '''Reads a face of a rubik cube to identify the subsquare colours and contours.
+
+    Assumes that face has no background in image.'''
+
     face_HSV = cv2.cvtColor(face, cv2.COLOR_BGR2HSV)
-    # for each colour get contours with position and label data then take 9 largest contours
-    store = []
-    for colour, HSV_range in COLOUR_MASKS.items():
+
+    #### For each colour get contours in that colour range
+    cont_colour_pairs = []
+    for colour, HSV_range in COLOUR_RANGES.items():
         mask = HSV_mask(face_HSV, HSV_range)
         contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        cont_colour_pairs += [(colour, cont) for cont in contours]
 
-        store += [(c, colour) for c in contours]
+    cont_colour_pairs = sorted(cont_colour_pairs, key=lambda val: cv2.contourArea(val[1]), reverse=True)
 
-    store = sorted(store, key=lambda val: cv2.contourArea(val[0]), reverse=True)
-    # use 9 largest contours to get orientation and relative positions
+    # Return 9 biggest contours as subfaces
+    return [SubFace(colour, cont) for colour, cont in cont_colour_pairs[:9]]
 
-    _ = cv2.drawContours(face, [cont for cont,_ in store][:9], -1,  (0,255,0), 3)
+def euclid_dist(a,b):
+    tot = 0
+    for a_i, b_i in zip(a,b):
+        tot += (a_i - b_i)**2
 
-    for cont, colour in store[:9]:
-        M = cv2.moments(cont)
-        x, y = int(M['m10']/M['m00']), int(M['m01']/M['m00'])
-        print(x, y, colour)
-        cv2.circle(face, (x, y), 50, (0,0,0),-1)
+    return np.sqrt(tot)
 
-    cv2.namedWindow('Foo', 0)
-    cv2.resizeWindow('Foo',400,400)
-    cv2.imshow('Foo', face)
-    cv2.waitKey(0)
+def read_subface_singleface(subfaces:list[SubFace], cube_dim=3) -> tuple[tuple[str]]:
+    '''Finds orientation of subfaces. Note only works if face is entirely in the plane of image.'''
 
-def main():
-    img_dir = '../img/'
-    colours = [f'w_{n}' for n in range(1,7)]
+    face_layout = [['' for n in range(cube_dim)] for m in range(cube_dim)]
 
-    imgs = []
-    for colour in colours:
-        img_name = f'{colour}.jpg'
-        img = cv2.imread(img_dir + img_name)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    # Sort subfaces by y-position to get rows and then each row by x-position to process
+    subfaces = sorted(subfaces, key=lambda face: face.get_center()[1])
+    for n in range(cube_dim):
+        row = subfaces[cube_dim*n:cube_dim*n+cube_dim]
+        row = sorted(row, key=lambda face: face.get_center()[0])
+        for m, face in enumerate(row):
+            face_layout[n][m] = face.colour
 
-        img_blur = cv2.GaussianBlur(img, (5,5), 100)
-        img_blur = cv2.resize(img_blur, (256, 256))
-
-        imgs.append(img_blur)
-
-        # fig, axs = plt.subplots(ncols=2, figsize=(16,8))
-        # axs[0].imshow(img)
-        # axs[1].hist(img.flatten(), bins=100)
-        # plt.show()
-
-    full_sample = np.array(imgs)
-    full_sample = full_sample.reshape((-1,3))
-
-    bgm_model = KMeans(n_clusters=10).fit(full_sample)
-
-    fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(16,24))
-    for i, img in enumerate(imgs):
-        axs[i%3, i//3].imshow(img)
-        axs[i%3, i//3].set_title(f'{colours[i]}')
-        axs[i%3, i//3].axis('off')
-
-    fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(16,24))
-    for i, img in enumerate(imgs):
-        bgm_labels = bgm_model.predict(img.reshape((-1,3)))
-        segments = bgm_labels.reshape(img.shape[0], img.shape[1])
-
-        axs[i%3, i//3].imshow(segments)
-        axs[i%3, i//3].set_title(f'{colours[i]}')
-        axs[i%3, i//3].axis('off')
-
-    fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(16,24))
-    for i, img in enumerate(imgs):
-        edges = cv2.Canny(img, 50, 200, 255)
-
-
-        axs[i%3, i//3].imshow(edges)
-        axs[i%3, i//3].set_title(f'{colours[i]}')
-        axs[i%3, i//3].axis('off')
-
-    plt.show()
+    return face_layout
 
 if __name__ == '__main__':
     img_arr = [f'../img/{val}.jpg' for val in range(1, 2)]
     for img_name in img_arr:
         img = cv2.imread(img_name)
-        read_face(img)
+        subfaces = get_subface_contours(img)
+
+        face_layout = read_subface_singleface(subfaces)
+        print(face_layout)
