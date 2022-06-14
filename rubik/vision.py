@@ -2,27 +2,10 @@ from dataclasses import dataclass
 
 import cv2
 import numpy as np
-from sklearn.mixture import BayesianGaussianMixture as BGMM
-from sklearn.cluster import KMeans
 
 from matplotlib import pyplot as plt
 
-
-#### Constants ####
-
-COLOUR_RANGES = {
-    'w' : ((0, 0, 220), (179, 15, 359)),
-    'g' : ((50, 130, 180), (60, 160, 210)),
-    'r' : ((170, 160, 200), (10, 240, 240)),
-    'b' : ((105, 45, 190), (140, 255, 255)),
-    'y' : ((25, 140, 210), (40, 255, 255)),
-    'o' : ((5, 120, 210), (20, 255, 255))
-}
-
-MAX_HUE = 179
-MAX_SAT = 255
-MAX_VAL = 255
-
+import rubik
 
 #### Classes ####
 
@@ -39,8 +22,21 @@ class SubFace:
 
         return self.center
 
-@dataclass
-class Rubik_Cube:
+
+#### Constants ####
+
+COLOUR_RANGES = {
+    'w' : ((0, 0, 220), (179, 15, 359)),
+    'g' : ((50, 130, 180), (60, 160, 210)),
+    'r' : ((170, 160, 200), (10, 240, 240)),
+    'b' : ((105, 45, 190), (140, 255, 255)),
+    'y' : ((25, 140, 210), (40, 255, 255)),
+    'o' : ((5, 120, 210), (20, 255, 255))
+}
+
+MAX_HUE = 179
+MAX_SAT = 255
+MAX_VAL = 255
 
 
 #### Functions ####
@@ -139,7 +135,7 @@ def get_subface_contours(face) -> list[SubFace]:
     cont_colour_pairs = []
     for colour, HSV_range in COLOUR_RANGES.items():
         mask = HSV_mask(face_HSV, HSV_range)
-        contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         cont_colour_pairs += [(colour, cont) for cont in contours]
 
     cont_colour_pairs = sorted(cont_colour_pairs, key=lambda val: cv2.contourArea(val[1]), reverse=True)
