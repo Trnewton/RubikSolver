@@ -5,7 +5,7 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 
-import rubik
+from rubik import RubikCube
 
 #### Classes ####
 
@@ -159,10 +159,19 @@ def read_subface_singleface(subfaces:list[SubFace], cube_dim=3) -> tuple[tuple[s
     return face_layout
 
 if __name__ == '__main__':
-    img_arr = [f'../img/{val}.jpg' for val in range(1, 2)]
+    img_arr = [f'../img/{val}.jpg' for val in range(1, 7)]
+    faces = []
     for img_name in img_arr:
         img = cv2.imread(img_name)
         subfaces = get_subface_contours(img)
         face_layout = read_subface_singleface(subfaces)
+        faces.append(face_layout)
 
-
+    cube = RubikCube(faces)
+    print(cube)
+    cube.rotate_face('w', 1)
+    print(cube)
+    cube.rotate_face('g', 1)
+    print(cube)
+    cube.rotate_face('y', 2)
+    print(cube)
