@@ -5,7 +5,7 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 
-from rubik import RubikCube
+import cubeModel
 
 #### Classes ####
 
@@ -167,11 +167,14 @@ if __name__ == '__main__':
         face_layout = read_subface_singleface(subfaces)
         faces.append(face_layout)
 
-    cube = RubikCube(faces)
+    print(faces)
+
+    cube = cubeModel.RubikCube(faces)
     print(cube)
-    cube.rotate_face('w', 1)
-    print(cube)
-    cube.rotate_face('g', 1)
-    print(cube)
-    cube.rotate_face('y', 2)
-    print(cube)
+
+    for face in cubeModel.Face:
+        print(face)
+        cube.rotate_face(face, 1)
+        print(cube)
+        cube.rotate_face(face, -1)
+        print(cube)
