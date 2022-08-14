@@ -40,14 +40,15 @@ def check_rotation():
 
 def check_g0_g1():
     cube = cubeModel.RubikCube(solved_cube)
-    randomize_cube(cube, 32)
+    randomize_cube(cube, 1, twists=thistlethwaite.Twists_G1)
     print(cube)
 
     pruner = search.Pruner(cube)
-    cube_sol, sol_path = search.dfs(cube, thistlethwaite.g1_solved, cubeModel.Twist, pruner, max_depth=7)
+    sol = search.dfs(cube, thistlethwaite.g1_solved, thistlethwaite.Twists_G0, pruner, max_depth=7)
+    print(sol.cube)
+    print(sol.moves)
 
-    print(cube_sol)
-    print(sol_path)
+
 
 
 if __name__ == '__main__':

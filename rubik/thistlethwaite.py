@@ -4,13 +4,21 @@ import cubeModel
 
 
 #### Constants ####
+Twists_G3 = [
+    cubeModel.Twist.L2, cubeModel.Twist.R2, cubeModel.Twist.F2,
+    cubeModel.Twist.B2, cubeModel.Twist.U2, cubeModel.Twist.D2,
+]
+Twists_G2 = Twists_G3 + [
+    cubeModel.Twist.L, cubeModel.Twist.LP, cubeModel.Twist.R, cubeModel.Twist.RP,
+]
+Twists_G1 = Twists_G2 + [
+    cubeModel.Twist.F, cubeModel.Twist.FP, cubeModel.Twist.B, cubeModel.Twist.BP,
+]
+Twists_G0 = Twists_G1 + [
+    cubeModel.Twist.U, cubeModel.Twist.UP, cubeModel.Twist.D, cubeModel.Twist.DP,
+]
 
 #### Classes ####
-
-@dataclass
-class Node:
-    cube: cubeModel.RubikCube
-    moves: list[str]
 
 
 #### Functions ####
@@ -61,18 +69,57 @@ def g1_solved(cube:cubeModel.RubikCube) -> bool:
       (RB is cubeModel.Colour.BLUE or RB is cubeModel.Colour.GREEN or BR is cubeModel.Colour.WHITE or BR is cubeModel.Colour.YELLOW))
 
 def g2_solved(cube:cubeModel.RubikCube) -> bool:
-    pass
+    LUB = cube.face(cubeModel.Face.L, 0, 0)
+    LUF = cube.face(cubeModel.Face.L, 0, 2)
+    LDB = cube.face(cubeModel.Face.L, 2, 0)
+    LDF = cube.face(cubeModel.Face.L, 2, 2)
+
+    RUB = cube.face(cubeModel.Face.R, 0, 2)
+    RUF = cube.face(cubeModel.Face.R, 0, 0)
+    RDB = cube.face(cubeModel.Face.R, 2, 2)
+    RDF = cube.face(cubeModel.Face.R, 2, 0)
+
+    # Edges in the M slice (between R and L).
+    UF = cube.face(cubeModel.Face.U, 2, 1)
+    FU = cube.face(cubeModel.Face.F, 0, 1)
+
+    UB = cube.face(cubeModel.Face.U, 0, 1)
+    BU = cube.face(cubeModel.Face.B, 0, 1)
+
+    DF = cube.face(cubeModel.Face.D, 0, 1)
+    FD = cube.face(cubeModel.Face.F, 2, 1)
+
+    DB = cube.face(cubeModel.Face.D, 2, 1)
+    BD = cube.face(cubeModel.Face.B, 2, 1)
+
+    # All left/right corner facets either blue or green.
+    # UF, UB, DF, DB in the M slice.  Note that the edges
+    # are already oriented.
+    return (
+      (LUB is cubeModel.Colour.BLUE or LUB is cubeModel.Colour.GREEN) and
+      (LUF is cubeModel.Colour.BLUE or LUF is cubeModel.Colour.GREEN) and
+      (LDB is cubeModel.Colour.BLUE or LDB is cubeModel.Colour.GREEN) and
+      (LDF is cubeModel.Colour.BLUE or LDF is cubeModel.Colour.GREEN) and
+      (RUB is cubeModel.Colour.BLUE or RUB is cubeModel.Colour.GREEN) and
+      (RUF is cubeModel.Colour.BLUE or RUF is cubeModel.Colour.GREEN) and
+      (RDB is cubeModel.Colour.BLUE or RDB is cubeModel.Colour.GREEN) and
+      (RDF is cubeModel.Colour.BLUE or RDF is cubeModel.Colour.GREEN) and
+
+      (UF is cubeModel.Colour.RED   or UF is cubeModel.Colour.ORANGE) and
+      (FU is cubeModel.Colour.WHITE or FU is cubeModel.Colour.YELLOW) and
+
+      (UB is cubeModel.Colour.RED   or UB is cubeModel.Colour.ORANGE) and
+      (BU is cubeModel.Colour.WHITE or BU is cubeModel.Colour.YELLOW) and
+
+      (DF is cubeModel.Colour.RED   or DF is cubeModel.Colour.ORANGE) and
+      (FD is cubeModel.Colour.WHITE or FD is cubeModel.Colour.YELLOW) and
+
+      (DB is cubeModel.Colour.RED   or DB is cubeModel.Colour.ORANGE) and
+      (BD is cubeModel.Colour.WHITE or BD is cubeModel.Colour.YELLOW)
+      )
 
 def g3_solved(cube:cubeModel.RubikCube) -> bool:
     pass
-
-def depth_first_search(cube:cubeModel.RubikCube, goal, pos_moves):
-    stack = [Node(cube)]
-
-    cur_node = stack.pop()
-    while not goal(cur_node):
-        pass
-
 
 
 def thistlethwaite(cube) -> str:
