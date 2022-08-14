@@ -1,11 +1,11 @@
 from collections import deque
 from typing import Callable
 
-import rubik.cubeModel as cubeModel
+import cubeModel
 
 class Pruner:
     def __init__(self, init_cube):
-        seen = {init_cube}
+        self.seen = {init_cube}
 
     def prune(self, new_move, node):
         last_move = node[1][-1]
@@ -43,14 +43,24 @@ class Pruner:
 def dfs(cube: cubeModel.RubikCube, goal: Callable, moves, pruner: Pruner, max_depth: int) -> None:
     '''Does a depth first search of twists on cube to find goal state.'''
 
-    queue = deque([(cube, [])])
+    if goal(cube):
+        return (cube, [])
 
+    queue = deque()
+    for move in moves:
+        queue.append((cube.copy().twist(move), [move]))
+
+    cur_depth = 1
     while queue:
         node = queue.popleft()
         if goal(node[0]):
             break
 
         if len(node[1]) < max_depth:
+            if len(node[1]) > cur_depth:
+                cur_depth = len(node[1])
+                print(cur_depth)
+
             for move in moves:
                 if pruner.prune(move, node):
                     continue

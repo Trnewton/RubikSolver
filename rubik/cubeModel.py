@@ -2,16 +2,17 @@ from enum import IntEnum, Enum
 
 import numpy as np
 
+col_2_str = ['r','o','w','y','g','b']
 
 #### Classes ####
 
 class Colour(IntEnum):
-    WHITE = 0
+    RED = 0
     ORANGE = 1
-    BLUE = 2
-    RED = 3
+    WHITE = 2
+    YELLOW = 3
     GREEN = 4
-    YELLOW = 5
+    BLUE = 5
 
 class Face(IntEnum):
     L = 0
@@ -41,22 +42,13 @@ class Twist(IntEnum):
     DP = 16
     D2 = 17
 
-col_2_face = {
-    'r' : 0,
-    'o' : 1,
-    'w' : 2,
-    'y' : 3,
-    'g' : 4,
-    'b' : 5,
-}
-
 col_2_adj: list = [
-    [2,5,3,4],  # r
-    [3,5,2,4],  # o
-    [1,5,0,4],  # w
-    [0,5,1,4],   # y
-    [1,2,0,3],  # g
-    [1,3,0,2],  # b
+    [3,4,2,5], # r
+    [2,4,3,5], # o
+    [0,4,1,5], # w
+    [1,4,0,5], # y
+    [0,3,1,2], # g
+    [0,2,1,3], # b
 ]
 
 class RubikCube:
@@ -65,9 +57,9 @@ class RubikCube:
 
     def __init__(self, faces) -> None:
         ''''''
-        self.faces = np.array(sorted(faces, key=lambda f: col_2_face[f[1][1]]), dtype=str)
 
-    #TODO: Negative Rotation does not work
+        self.faces = np.array(sorted(faces, key=lambda f: f[1][1]), dtype=Colour)
+
     def rotate_face(self, face:Face, rotation:int) -> None:
         ''''''
 
@@ -142,13 +134,14 @@ class RubikCube:
             case Twist.UP:
                 self.rotate_face(Face.U, -1)
             # bot
-            case Twist.B:
-                self.rotate_face(Face.B, 1)
-            case Twist.B2:
-                self.rotate_face(Face.B, 2)
-            case Twist.BP:
-                self.rotate_face(Face.B, -1)
+            case Twist.D:
+                self.rotate_face(Face.D, 1)
+            case Twist.D2:
+                self.rotate_face(Face.D, 2)
+            case Twist.DP:
+                self.rotate_face(Face.D, -1)
 
+        return self
 
     def get_col(self, face, x, y) -> str:
         ''''''
@@ -158,25 +151,28 @@ class RubikCube:
     def print(self):
         ''''''
         # TODO: Make print in cuibe layout
-        for colour, idx in self.col_2_face.items():
+        for colour, idx in list(Colour):
             print(colour)
             print(self.faces[idx])
 
     def __str__(self):
         name = ''
         for row in self.faces[4]:
-            name += f'\t|{"|".join(r for r in row)}|\n'
+            name += f'\t|{"|".join(col_2_str[r] for r in row)}|\n'
         name += '\t-------\n'
 
         for n in range(3):
-            name += f'|{"|".join(r for r in self.faces[0][n])}|'
-            name += f'\t|{"|".join(r for r in self.faces[2][n])}|'
-            name += f'\t|{"|".join(r for r in self.faces[1][n])}|'
-            name += f'\t|{"|".join(r for r in self.faces[3][n])}|\n'
+            name += f'|{"|".join(col_2_str[r] for r in self.faces[0][n])}|'
+            name += f'\t|{"|".join(col_2_str[r] for r in self.faces[2][n])}|'
+            name += f'\t|{"|".join(col_2_str[r] for r in self.faces[1][n])}|'
+            name += f'\t|{"|".join(col_2_str[r] for r in self.faces[3][n])}|\n'
 
         name += '\t-------\n'
 
         for row in self.faces[5]:
-            name += f'\t|{"|".join(r for r in row)}|\n'
+            name += f'\t|{"|".join(col_2_str[r] for r in row)}|\n'
 
         return name
+
+    def copy(self):
+        return RubikCube(self.faces.copy())
