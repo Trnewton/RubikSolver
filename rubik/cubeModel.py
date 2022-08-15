@@ -2,24 +2,24 @@ from enum import IntEnum, Enum
 
 import numpy as np
 
-col_2_str = ['r','o','w','y','g','b']
+col_2_str = ['w','g','r','b','o','y']
 
 #### Classes ####
 
 class Colour(IntEnum):
-    RED = 0
-    ORANGE = 1
-    WHITE = 2
-    YELLOW = 3
-    GREEN = 4
-    BLUE = 5
+    WHITE = 0
+    GREEN = 1
+    RED = 2
+    BLUE = 3
+    ORANGE = 4
+    YELLOW = 5
 
 class Face(IntEnum):
-    L = 0
-    R = 1
+    U = 0
+    L = 1
     F = 2
-    B = 3
-    U = 4
+    R = 3
+    B = 4
     D = 5
 
 class Twist(IntEnum):
@@ -151,26 +151,25 @@ class RubikCube:
     def print(self):
         ''''''
         # TODO: Make print in cuibe layout
-        for colour, idx in list(Colour):
-            print(colour)
-            print(self.faces[idx])
+        for face in self.faces:
+            print(face)
 
     def __str__(self):
         name = ''
-        for row in self.faces[4]:
-            name += f'\t|{"|".join(col_2_str[r] for r in row)}|\n'
+        for row in self.faces[Face.U]:
+            name += f'\t|{"|".join(col_2_str[r] if isinstance(r, Colour) else r for r in row)}|\n'
         name += '\t-------\n'
 
         for n in range(3):
-            name += f'|{"|".join(col_2_str[r] for r in self.faces[0][n])}|'
-            name += f'\t|{"|".join(col_2_str[r] for r in self.faces[2][n])}|'
-            name += f'\t|{"|".join(col_2_str[r] for r in self.faces[1][n])}|'
-            name += f'\t|{"|".join(col_2_str[r] for r in self.faces[3][n])}|\n'
+            name += f'|{"|".join(col_2_str[r] if isinstance(r, Colour) else r for r in self.faces[Face.L][n])}|'
+            name += f'\t|{"|".join(col_2_str[r] if isinstance(r, Colour) else r for r in self.faces[Face.F][n])}|'
+            name += f'\t|{"|".join(col_2_str[r] if isinstance(r, Colour) else r for r in self.faces[Face.R][n])}|'
+            name += f'\t|{"|".join(col_2_str[r] if isinstance(r, Colour) else r for r in self.faces[Face.B][n])}|\n'
 
         name += '\t-------\n'
 
-        for row in self.faces[5]:
-            name += f'\t|{"|".join(col_2_str[r] for r in row)}|\n'
+        for row in self.faces[Face.D]:
+            name += f'\t|{"|".join(col_2_str[r] if isinstance(r, Colour) else r for r in row)}|\n'
 
         return name
 
