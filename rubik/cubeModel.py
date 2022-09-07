@@ -2,17 +2,24 @@ from enum import IntEnum, Enum
 
 import numpy as np
 
-col_2_str = ['w','g','r','b','o','y']
+col_2_str = [
+    'g',
+    'r',
+    'w',
+    'o',
+    'y',
+    'b',
+]
 
 #### Classes ####
 
 class Colour(IntEnum):
-    WHITE = 0
-    GREEN = 1
-    RED = 2
-    BLUE = 3
-    ORANGE = 4
-    YELLOW = 5
+    GREEN = 0
+    RED = 1
+    WHITE = 2
+    ORANGE = 3
+    YELLOW = 4
+    BLUE = 5
 
 class Face(IntEnum):
     U = 0
@@ -43,11 +50,11 @@ class Twist(IntEnum):
     D2 = 17
 
 col_2_adj: list = [
-    [3,4,2,5], # r
-    [2,4,3,5], # o
-    [0,4,1,5], # w
-    [1,4,0,5], # y
     [0,3,1,2], # g
+    [3,4,2,5], # r
+    [0,4,1,5], # w
+    [2,4,3,5], # o
+    [1,4,0,5], # y
     [0,2,1,3], # b
 ]
 
@@ -57,8 +64,8 @@ class RubikCube:
 
     def __init__(self, faces) -> None:
         ''''''
-
-        self.faces = np.array(sorted(faces, key=lambda f: f[1][1]), dtype=Colour)
+        self.edge_
+        self.facaes = np.array(sorted(faces, key=lambda f: f[1][1]), dtype=Colour)
 
     def rotate_face(self, face:Face, rotation:int) -> None:
         ''''''

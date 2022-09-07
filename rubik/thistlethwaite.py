@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 import cubeModel
-
+from cubeModel import Colour
 
 #### Constants ####
 Twists_G3 = [
@@ -55,79 +55,67 @@ def g1_solved(cube:cubeModel.RubikCube) -> bool:
     DB = cube.faces[cubeModel.Face.D, 2, 1]
 
     return (
-      (UF is cubeModel.Colour.BLUE or UF is cubeModel.Colour.GREEN or
-      FU is cubeModel.Colour.WHITE or FU is cubeModel.Colour.YELLOW) and
-      (UB is cubeModel.Colour.BLUE or UB is cubeModel.Colour.GREEN or
-      BU is cubeModel.Colour.WHITE or BU is cubeModel.Colour.YELLOW) and
-      (DF is cubeModel.Colour.BLUE or DF is cubeModel.Colour.GREEN or
-      FD is cubeModel.Colour.WHITE or FD is cubeModel.Colour.YELLOW) and
-      (DB is cubeModel.Colour.BLUE or DB is cubeModel.Colour.GREEN or
-      BD is cubeModel.Colour.WHITE or BD is cubeModel.Colour.YELLOW) and
-      (LU is cubeModel.Colour.BLUE or LU is cubeModel.Colour.GREEN or
-      UL is cubeModel.Colour.WHITE or UL is cubeModel.Colour.YELLOW) and
-      (LD is cubeModel.Colour.BLUE or LD is cubeModel.Colour.GREEN or
-      DL is cubeModel.Colour.WHITE or DL is cubeModel.Colour.YELLOW) and
-      (RU is cubeModel.Colour.BLUE or RU is cubeModel.Colour.GREEN or
-      UR is cubeModel.Colour.WHITE or UR is cubeModel.Colour.YELLOW) and
-      (RD is cubeModel.Colour.BLUE or RD is cubeModel.Colour.GREEN or
-      DR is cubeModel.Colour.WHITE or DR is cubeModel.Colour.YELLOW) and
-      (LF is cubeModel.Colour.BLUE or LF is cubeModel.Colour.GREEN or
-      FL is cubeModel.Colour.WHITE or FL is cubeModel.Colour.YELLOW) and
-      (LB is cubeModel.Colour.BLUE or LB is cubeModel.Colour.GREEN or
-      BL is cubeModel.Colour.WHITE or BL is cubeModel.Colour.YELLOW) and
-      (RF is cubeModel.Colour.BLUE or RF is cubeModel.Colour.GREEN or
-      FR is cubeModel.Colour.WHITE or FR is cubeModel.Colour.YELLOW) and
-      (RB is cubeModel.Colour.BLUE or RB is cubeModel.Colour.GREEN or
-      BR is cubeModel.Colour.WHITE or BR is cubeModel.Colour.YELLOW))
+      (UF is Colour.ORANGE or UF is Colour.RED or FU is Colour.GREEN or FU is Colour.BLUE) and
+      (UB is Colour.ORANGE or UB is Colour.RED or BU is Colour.GREEN or BU is Colour.BLUE) and
+      (DF is Colour.ORANGE or DF is Colour.RED or FD is Colour.GREEN or FD is Colour.BLUE) and
+      (DB is Colour.ORANGE or DB is Colour.RED or BD is Colour.GREEN or BD is Colour.BLUE) and
+      (LU is Colour.ORANGE or LU is Colour.RED or UL is Colour.GREEN or UL is Colour.BLUE) and
+      (LD is Colour.ORANGE or LD is Colour.RED or DL is Colour.GREEN or DL is Colour.BLUE) and
+      (RU is Colour.ORANGE or RU is Colour.RED or UR is Colour.GREEN or UR is Colour.BLUE) and
+      (RD is Colour.ORANGE or RD is Colour.RED or DR is Colour.GREEN or DR is Colour.BLUE) and
+      (LF is Colour.ORANGE or LF is Colour.RED or FL is Colour.GREEN or FL is Colour.BLUE) and
+      (LB is Colour.ORANGE or LB is Colour.RED or BL is Colour.GREEN or BL is Colour.BLUE) and
+      (RF is Colour.ORANGE or RF is Colour.RED or FR is Colour.GREEN or FR is Colour.BLUE) and
+      (RB is Colour.ORANGE or RB is Colour.RED or BR is Colour.GREEN or BR is Colour.BLUE))
 
 def g2_solved(cube:cubeModel.RubikCube) -> bool:
-    LUB = cube.face(cubeModel.Face.L, 0, 0)
-    LUF = cube.face(cubeModel.Face.L, 0, 2)
-    LDB = cube.face(cubeModel.Face.L, 2, 0)
-    LDF = cube.face(cubeModel.Face.L, 2, 2)
+    LUB = cube.faces[cubeModel.Face.L, 0, 0]
+    LUF = cube.faces[cubeModel.Face.L, 0, 2]
+    LDB = cube.faces[cubeModel.Face.L, 2, 0]
+    LDF = cube.faces[cubeModel.Face.L, 2, 2]
 
-    RUB = cube.face(cubeModel.Face.R, 0, 2)
-    RUF = cube.face(cubeModel.Face.R, 0, 0)
-    RDB = cube.face(cubeModel.Face.R, 2, 2)
-    RDF = cube.face(cubeModel.Face.R, 2, 0)
+    RUB = cube.faces[cubeModel.Face.R, 0, 2]
+    RUF = cube.faces[cubeModel.Face.R, 0, 0]
+    RDB = cube.faces[cubeModel.Face.R, 2, 2]
+    RDF = cube.faces[cubeModel.Face.R, 2, 0]
 
     # Edges in the M slice (between R and L).
-    UF = cube.face(cubeModel.Face.U, 2, 1)
-    FU = cube.face(cubeModel.Face.F, 0, 1)
+    UF = cube.faces[cubeModel.Face.U, 2, 1]
+    FU = cube.faces[cubeModel.Face.F, 0, 1]
 
-    UB = cube.face(cubeModel.Face.U, 0, 1)
-    BU = cube.face(cubeModel.Face.B, 0, 1)
+    UB = cube.faces[cubeModel.Face.U, 0, 1]
+    BU = cube.faces[cubeModel.Face.B, 0, 1]
 
-    DF = cube.face(cubeModel.Face.D, 0, 1)
-    FD = cube.face(cubeModel.Face.F, 2, 1)
+    DF = cube.faces[cubeModel.Face.D, 0, 1]
+    FD = cube.faces[cubeModel.Face.F, 2, 1]
 
-    DB = cube.face(cubeModel.Face.D, 2, 1)
-    BD = cube.face(cubeModel.Face.B, 2, 1)
+    DB = cube.faces[cubeModel.Face.D, 2, 1]
+    BD = cube.faces[cubeModel.Face.B, 2, 1]
 
     # All left/right corner facets either blue or green.
     # UF, UB, DF, DB in the M slice.  Note that the edges
     # are already oriented.
     return (
-      (LUB is cubeModel.Colour.BLUE or LUB is cubeModel.Colour.GREEN) and
-      (LUF is cubeModel.Colour.BLUE or LUF is cubeModel.Colour.GREEN) and
-      (LDB is cubeModel.Colour.BLUE or LDB is cubeModel.Colour.GREEN) and
-      (LDF is cubeModel.Colour.BLUE or LDF is cubeModel.Colour.GREEN) and
-      (RUB is cubeModel.Colour.BLUE or RUB is cubeModel.Colour.GREEN) and
-      (RUF is cubeModel.Colour.BLUE or RUF is cubeModel.Colour.GREEN) and
-      (RDB is cubeModel.Colour.BLUE or RDB is cubeModel.Colour.GREEN) and
-      (RDF is cubeModel.Colour.BLUE or RDF is cubeModel.Colour.GREEN) and
+      (LUB is Colour.ORANGE or LUB is Colour.RED) and
+      (LUF is Colour.ORANGE or LUF is Colour.RED) and
+      (LDB is Colour.ORANGE or LDB is Colour.RED) and
+      (LDF is Colour.ORANGE or LDF is Colour.RED) and
+      (RUB is Colour.ORANGE or RUB is Colour.RED) and
+      (RUF is Colour.ORANGE or RUF is Colour.RED) and
+      (RDB is Colour.ORANGE or RDB is Colour.RED) and
+      (RDF is Colour.ORANGE or RDF is Colour.RED) and
 
-      (UF is cubeModel.Colour.RED   or UF is cubeModel.Colour.ORANGE) and
-      (FU is cubeModel.Colour.WHITE or FU is cubeModel.Colour.YELLOW) and
+      (UF is Colour.WHITE or UF is Colour.YELLOW) and
+      (FU is Colour.GREEN or FU is Colour.BLUE) and
 
-      (UB is cubeModel.Colour.RED   or UB is cubeModel.Colour.ORANGE) and
-      (BU is cubeModel.Colour.WHITE or BU is cubeModel.Colour.YELLOW) and
+      (UB is Colour.WHITE or UB is Colour.YELLOW) and
+      (BU is Colour.GREEN or BU is Colour.BLUE) and
 
-      (DF is cubeModel.Colour.RED   or DF is cubeModel.Colour.ORANGE) and
-      (FD is cubeModel.Colour.WHITE or FD is cubeModel.Colour.YELLOW) and
+      (DF is Colour.WHITE or DF is Colour.YELLOW) and
+      (FD is Colour.GREEN or FD is Colour.BLUE) and
 
-      (DB is cubeModel.Colour.RED   or DB is cubeModel.Colour.ORANGE) and
-      (BD is cubeModel.Colour.WHITE or BD is cubeModel.Colour.YELLOW)
+      (DB is Colour.WHITE or DB is Colour.YELLOW) and
+      (BD is Colour.GREEN or BD is Colour.BLUE)
       )
 
 def g3_solved(cube:cubeModel.RubikCube) -> bool:

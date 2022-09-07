@@ -1,6 +1,6 @@
 from collections import deque
 from dataclasses import dataclass, field
-from typing import Callable
+from typing import Callable, Iterable
 
 import cubeModel
 
@@ -46,8 +46,36 @@ class Pruner:
         return False
 
 
-def dfs(cube: cubeModel.RubikCube, goal: Callable, moves, pruner: Pruner, max_depth: int) -> Node:
+def dfs(cube: cubeModel.RubikCube, goal: Callable, moves: Iterable, pruner: Pruner, max_depth: int) -> Node:
     '''Does a depth first search of twists on cube to find goal state.'''
+
+    if goal(cube):
+        return Node(cube)
+
+    queue = deque()
+    for move in moves:
+        queue.append(Node(cube.copy().twist(move), [move]))
+
+    cur_depth = 1
+    while queue:
+        node = queue.popleft()
+        if goal(node.cube):
+            break
+
+        if len(node.moves) < max_depth:
+            if len(node.moves) > cur_depth:
+                cur_depth = len(node.moves)
+                print(cur_depth)
+
+            for move in moves:
+                if pruner.prune(move, node):
+                    continue
+                queue.append(Node(node.cube.copy().twist(move), node.moves + [move]))
+
+    return node
+
+def ida_star(cube: cubeModel.RubikCube, goal: Callable, moves, pruner: Pruner, max_depth: int) -> Node:
+    '''Performs a iteratively deepending A* search.'''
 
     if goal(cube):
         return Node(cube)
