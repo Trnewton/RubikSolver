@@ -12,10 +12,10 @@ Twists_G2 = Twists_G3 + [
     cubeModel.Twist.L, cubeModel.Twist.LP, cubeModel.Twist.R, cubeModel.Twist.RP,
 ]
 Twists_G1 = Twists_G2 + [
-    cubeModel.Twist.F, cubeModel.Twist.FP, cubeModel.Twist.B, cubeModel.Twist.BP,
+    cubeModel.Twist.U, cubeModel.Twist.UP, cubeModel.Twist.D, cubeModel.Twist.DP,
 ]
 Twists_G0 = Twists_G1 + [
-    cubeModel.Twist.U, cubeModel.Twist.UP, cubeModel.Twist.D, cubeModel.Twist.DP,
+    cubeModel.Twist.F, cubeModel.Twist.FP, cubeModel.Twist.B, cubeModel.Twist.BP,
 ]
 
 #### Classes ####

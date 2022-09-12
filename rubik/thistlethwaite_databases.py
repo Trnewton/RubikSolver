@@ -33,7 +33,14 @@ class G0Database(PatternDatabase):
     def __init__(self) -> None:
         super.__init__(self, 2048)
 
-    def _index(self, cube: cubeModel.RubikCube) -> int:
+    def _index(self, cube: cubeModel.RubikCubeIndex) -> int:
+        val = 0
+        base = 1
+        for idx in cubeModel.EdgeIdx:
+            val += cube.edges[idx].orientation * base
+            base *= 2
+
+        return val
 
 
 class G1Database(PatternDatabase):

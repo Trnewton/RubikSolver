@@ -58,7 +58,7 @@ def dfs(cube: cubeModel.RubikCube, goal: Callable, moves: Iterable, pruner: Prun
 
     cur_depth = 1
     while queue:
-        node = queue.popleft()
+        node = queue.pop()
         if goal(node.cube):
             break
 
@@ -87,6 +87,33 @@ def ida_star(cube: cubeModel.RubikCube, goal: Callable, moves, pruner: Pruner, m
     cur_depth = 1
     while queue:
         node = queue.popleft()
+        if goal(node.cube):
+            break
+
+        if len(node.moves) < max_depth:
+            if len(node.moves) > cur_depth:
+                cur_depth = len(node.moves)
+                print(cur_depth)
+
+            for move in moves:
+                if pruner.prune(move, node):
+                    continue
+                queue.append(Node(node.cube.copy().twist(move), node.moves + [move]))
+
+    return node
+
+def bfs(cube: cubeModel.RubikCube, goal: Callable, moves: Iterable, pruner: Pruner, max_depth: int) -> Node:
+
+    if goal(cube):
+        return Node(cube)
+
+    queue = deque()
+    for move in moves:
+        queue.append(Node(cube.copy().twist(move), [move]))
+
+    cur_depth = 1
+    while queue:
+        node = queue.pop()
         if goal(node.cube):
             break
 
