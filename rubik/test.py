@@ -55,4 +55,4 @@ def check_g0_g1():
 
 if __name__ == '__main__':
     cube = cubeModel.RubikCubeIndex(solved_cube)
-    this_db_0 = G0Database
+    this_db_0 = G0Database()
