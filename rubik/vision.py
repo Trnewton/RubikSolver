@@ -159,6 +159,7 @@ def read_subface_singleface(subfaces:list[SubFace], cube_dim=3) -> tuple[tuple[s
     return face_layout
 
 if __name__ == '__main__':
+    # TODO: This way of hardcoded loading images is probably bad...
     img_arr = [f'../img/{val}.jpg' for val in range(1, 7)]
     faces = []
     for img_name in img_arr:

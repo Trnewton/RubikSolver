@@ -1,0 +1,60 @@
+Corner Orientations
+Ben:
+ 0: ULB RBY
+ 1: URB RGY
+ 2: URF RGW
+ 3: ULF RBW
+ 4: DLF OBW
+ 5: DLB OBY
+ 6: DRB OGY
+ 7: DRF OGW
+
+    ULB URB URF ULF DLF DLB DRB DRF
+ULB 0   1   0   1   0   1   0   1
+URB 1   0   1   0   1   0   1   0
+URF 0   1   0   1   0   1   0   1
+ULF 1   0   1   0   1   0   1   0
+DLF 0   1   0   1   0   1   0   1
+DLB 1   0   1   0   1   0   1   0
+DRB 0   1   0   1   0   1   0   1
+DRF 1   0   1   0   1   0   1   0
+
+ 0: 000
+ 1: 010
+ 2: 011
+ 3: 001
+ 4: 101
+ 5: 100
+ 6: 110
+ 7: 111
+
+
+-----------------------------------
+
+        |y|r|r|
+        |g|g|g|
+        |g|g|g|
+        -------
+|b|r|r| |w|w|w| |o|o|y| |g|y|r|
+|b|r|r| |w|w|w| |o|o|g| |y|y|y|
+|y|r|r| |w|w|w| |o|o|g| |o|y|b|
+        -------
+        |b|b|b|
+        |b|b|b|
+        |o|o|y|
+
+        |r|r|y|
+        |g|g|g|
+        |g|g|g|
+        -------
+|b|r|r| |w|w|w| |o|o|r| |g|y|y|
+|b|r|r| |w|w|w| |o|o|g| |y|y|y|
+|o|r|r| |w|w|w| |o|o|g| |y|y|b|
+        -------
+        |b|b|b|
+        |b|b|b|
+        |y|o|o|
+
+----------------------------------- 29/04/2024 -----------------------------------
+  - Miss match in RubikCube and RubikCubeIndex prints with two twits seems to be
+  from RubikCube.

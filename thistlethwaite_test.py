@@ -1,12 +1,9 @@
-from distutils.util import change_root
 import random
 from typing import Iterable
+import unittest
 
-import cubeModel
-from cubeModel import Colour
-from rubik.thistlethwaite_databases import G0Database
-import search
-import thistlethwaite
+from rubik import cubeModel
+from rubik import thistlethwaite
 
 
 def randomize_cube(cube: cubeModel.RubikCube, num_twists: int, twists: Iterable=None) -> None:
@@ -18,30 +15,15 @@ def randomize_cube(cube: cubeModel.RubikCube, num_twists: int, twists: Iterable=
         cube.twist(twist)
 
 
-solved_cube = [
+
+solved_cube = cubeModel.RubikCubeIndex(faces=[
     [[c,c,c],
     [c,c,c],
     [c,c,c]] for c in cubeModel.Colour
-]
-
-def check_rotation():
-    twists = [
-        cubeModel.Twist.L2,
-        cubeModel.Twist.R2,
-        cubeModel.Twist.F2,
-        cubeModel.Twist.B2,
-        cubeModel.Twist.U2,
-        cubeModel.Twist.D2,
-    ]
-    for twist in twists:
-        print(twist)
-        cube = cubeModel.RubikCube(solved_cube)
-        cube.twist(twist)
-        print(cube)
-
+])
 
 def check_g0_g1():
-    cube = cubeModel.RubikCube(solved_cube)
+    cube = solved_cube.copy()
     randomize_cube(cube, 1, twists=thistlethwaite.Twists_G1)
     print(cube)
 
@@ -50,9 +32,13 @@ def check_g0_g1():
     # print(sol.cube)
     # print(sol.moves)
 
+class TestGroupChecks(unittest.TestCase):
 
+    def test_g1_solved(self):
+        self.assertTrue(thistlethwaite.g1_solved(solved_cube))
 
+    def test_g1_1(self):
+        self.assertFalse(thistlethwaite.g1_solved(solved_cube.copy().rotate_face(cubeModel.Face.D, 1)))
 
 if __name__ == '__main__':
-    cube = cubeModel.RubikCubeIndex(solved_cube)
-    this_db_0 = G0Database()
+    unittest.main()

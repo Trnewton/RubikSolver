@@ -31,7 +31,7 @@ class PatternDatabase(ABC):
 
 class G0Database(PatternDatabase):
     def __init__(self) -> None:
-        super.__init__(self, 2048)
+        super().__init__(2048)
 
     def _index(self, cube: cubeModel.RubikCubeIndex) -> int:
         val = 0
