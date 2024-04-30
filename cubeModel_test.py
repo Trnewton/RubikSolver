@@ -15,24 +15,6 @@ solved_cube_index = cubeModel.RubikCubeIndex(faces=[
     [c,c,c]] for c in cubeModel.Colour
 ])
 
-
-# TODO: Split testing of orientations and print
-def test_rotation():
-        twists = [
-            cubeModel.Twist.B,
-            # cubeModel.Twist.F2,
-            # cubeModel.Twist.FP,
-            # cubeModel.Twist.R,
-            # cubeModel.Twist.F,
-            # cubeModel.Twist.B,
-            # cubeModel.Twist.U,
-            # cubeModel.Twist.D,
-        ]
-        for twist in twists:
-            print(twist)
-            print(solved_cube.copy().twist(twist))
-            print(solved_cube_index.copy().twist(twist))
-
 class TestCubeModel(unittest.TestCase):
     ''''''
 
@@ -125,6 +107,10 @@ class TestCubeModel(unittest.TestCase):
         twists = (
             cubeModel.Twist.L,
             cubeModel.Twist.B,
+            cubeModel.Twist.D,
+            cubeModel.Twist.R,
+            cubeModel.Twist.F,
+            cubeModel.Twist.U,
         )
 
         cube = solved_cube.copy()
@@ -142,4 +128,3 @@ class TestCubeModel(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-    # test_rotation()

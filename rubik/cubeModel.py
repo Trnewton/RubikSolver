@@ -4,7 +4,8 @@ from enum import IntEnum, Enum
 
 import numpy as np
 
-#
+#### Classes ####
+
 col_2_str = [
     'g',
     'r',
@@ -13,14 +14,6 @@ col_2_str = [
     'y',
     'b',
 ]
-
-
-#### Function ####
-def edge_orientatoin(face_1, face_2):
-    pass
-
-
-#### Classes ####
 
 class Colour(IntEnum):
     ''''''
@@ -113,7 +106,6 @@ corner_order = (
     (Face.D, Face.R, Face.B), # DBR
 )
 
-
 class Twist(IntEnum):
     ''''''
     L = 0
@@ -136,17 +128,51 @@ class Twist(IntEnum):
     D2 = 17
 
 # TODO: There is some really bad coupling going on here, try to remove.
-col_2_adj: list = [
-    [Face.L, Face.B, Face.R, Face.F], # g/U
-    [Face.B, Face.U, Face.F, Face.D], # r/L
-    [Face.L, Face.U, Face.R, Face.D], # w/F
-    [Face.F, Face.U, Face.B, Face.D], # o/R
-    [Face.R, Face.U, Face.L, Face.D], # y/B
-    [Face.L, Face.F, Face.R, Face.B], # b/D
-]
+U_adj = (
+    (Face.L,0,2), (Face.L,0,1), (Face.L,0,0),
+    (Face.B,0,2), (Face.B,0,1), (Face.B,0,0),
+    (Face.R,0,2), (Face.R,0,1), (Face.R,0,0),
+    (Face.F,0,2), (Face.F,0,1), (Face.F,0,0)
+)
+
+L_adj = (
+    (Face.B,2,2), (Face.B,1,2), (Face.B,0,2),
+    (Face.U,0,0), (Face.U,1,0), (Face.U,2,0),
+    (Face.F,0,0), (Face.F,1,0), (Face.F,2,0),
+    (Face.D,0,0), (Face.D,1,0), (Face.D,2,0)
+)
+
+F_adj = (
+    (Face.L,2,2), (Face.L,1,2), (Face.L,0,2),
+    (Face.U,2,0), (Face.U,2,1), (Face.U,2,2),
+    (Face.R,0,0), (Face.R,1,0), (Face.R,2,0),
+    (Face.D,0,2), (Face.D,0,1), (Face.D,0,0)
+)
+
+R_adj = (
+    (Face.F,2,2), (Face.F,1,2), (Face.F,0,2),
+    (Face.U,2,2), (Face.U,1,2), (Face.U,0,2),
+    (Face.B,0,0), (Face.B,1,0), (Face.B,2,0),
+    (Face.D,2,2), (Face.D,1,2), (Face.D,0,2)
+)
+
+B_adj = (
+    (Face.R,2,2), (Face.R,1,2), (Face.R,0,2),
+    (Face.U,0,2), (Face.U,0,1), (Face.U,0,0),
+    (Face.L,0,0), (Face.L,1,0), (Face.L,2,0),
+    (Face.D,2,0), (Face.D,2,1), (Face.D,2,2)
+)
+
+D_adj = (
+    (Face.L,2,0), (Face.L,2,1), (Face.L,2,2),
+    (Face.F,2,0), (Face.F,2,1), (Face.F,2,2),
+    (Face.R,2,0), (Face.R,2,1), (Face.R,2,2),
+    (Face.B,2,0), (Face.B,2,1), (Face.B,2,2)
+)
+
+face_2_adj = (U_adj, L_adj, F_adj, R_adj, B_adj,D_adj)
 
 
-# TODO: Error in multi twists looks to be in face based RubikCubde model
 class RubikCube:
     '''Represents orientation of Rubik cube.'''
 
@@ -157,37 +183,12 @@ class RubikCube:
     def rotate_face(self, face:Face, rotation:int):
         ''''''
 
-        # rotate sides
-        store = []
-        for adj_face in col_2_adj[face]:
-            side = col_2_adj[adj_face].index(face)
-            if side == 0: # left
-                column = np.flip(self.faces[adj_face][:,0].copy())
-                store.append([side, column])
-            elif side == 1: # top
-                row = self.faces[adj_face][0].copy()
-                store.append([side, row])
-            elif side == 2: # right
-                column = np.flip(self.faces[adj_face][:,2].copy())
-                store.append([side, column])
-            elif side == 3: # bottom
-                row = self.faces[adj_face][2].copy()
-                store.append([side, row])
+        # Rotate adjacent facelets
+        store = [self.faces[idx] for idx in face_2_adj[face]]
+        for n, facelet in enumerate(store):
+            self.faces[face_2_adj[face][(n + 3*rotation)%12]] = facelet
 
-        #
-        for n, adj_face in enumerate(col_2_adj[face]):
-            _, face_vec = store[(n-rotation)%4].copy()
-            side, _ = store[n]
-            if side == 0: # left
-                self.faces[adj_face][:,0] = face_vec
-            elif side == 1: # top
-                self.faces[adj_face][0] = face_vec
-            elif side == 2: # right
-                self.faces[adj_face][:,2] = face_vec
-            elif side == 3: # bottom
-                self.faces[adj_face][2] = face_vec
-
-        # rotate face
+        # Rotate face
         self.faces[face] = np.rot90(self.faces[face], k=-rotation)
 
         return self
@@ -552,7 +553,6 @@ class RubikCubeIndex:
             # Error
             print('Error')
             pass
-
 
     def copy(self):
         cube_copy = RubikCubeIndex()
